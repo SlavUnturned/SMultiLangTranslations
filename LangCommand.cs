@@ -1,12 +1,10 @@
 ﻿using Rocket.API;
-using Rocket.Unturned.Chat;
+using Steamworks;
 using System.Collections.Generic;
 using System.Linq;
+using static SMultiLangTranslations.Utils;
 using Color = UnityEngine.Color;
 using IRP = Rocket.API.IRocketPlayer;
-using UP = Rocket.Unturned.Player.UnturnedPlayer;
-using static SMultiLangTranslations.Utils;
-using Steamworks;
 
 namespace SMultiLangTranslations
 {
@@ -32,11 +30,12 @@ namespace SMultiLangTranslations
             if (args.Length == 1 && (lang = args[0]).Length == 2 && lang.All(x => char.IsLetter(x)))
             {
                 conf.SetLanguage(steamID, lang);
-                message = Translate(LangChanged, lang);
+                message = Translate(key: LangChanged, lang);
                 color = default;
             }
             Say(message, color);
         }
+
         internal const string
             LangChanged = nameof(LangChanged),
             LangError = nameof(LangError);

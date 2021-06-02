@@ -1,11 +1,6 @@
 ﻿using Rocket.API;
 using Rocket.Core.Plugins;
-using UP = Rocket.Unturned.Player.UnturnedPlayer;
-using Rocket.Core.Utils;
 using Steamworks;
-using System.Reflection;
-using Rocket.Core.Logging;
-using System.Linq;
 
 namespace SMultiLangTranslations
 {
@@ -15,12 +10,17 @@ namespace SMultiLangTranslations
         {
             _Translator = MultiLangManager.RegisterTranslator(this);
         }
+
         internal MultiLangTranslator _Translator;
         protected MultiLangTranslator Translator => _Translator;
+
         public string Translate(string code, string key, params object[] placeholder) => Translator.Translate(code, key, placeholder);
+
         public new string Translate(string key, params object[] placeholder) => Translator.Translate(key, placeholder);
+
         public string Translate(CSteamID steamID, string key, params object[] placeholder) => Translator.Translate(steamID, key, placeholder);
     }
+
     public abstract class MultiLangRocketPlugin<PluginConfiguration> : RocketPlugin<PluginConfiguration>, IMultiLangTranslator
         where PluginConfiguration : class, IRocketPluginConfiguration
     {
@@ -28,10 +28,14 @@ namespace SMultiLangTranslations
         {
             _Translator = MultiLangManager.RegisterTranslator(this);
         }
+
         internal MultiLangTranslator _Translator;
         protected MultiLangTranslator Translator => _Translator;
+
         public string Translate(string code, string key, params object[] placeholder) => Translator.Translate(code, key, placeholder);
+
         public new string Translate(string key, params object[] placeholder) => Translator.Translate(key, placeholder);
+
         public string Translate(CSteamID steamID, string key, params object[] placeholder) => Translator.Translate(steamID, key, placeholder);
     }
 }
