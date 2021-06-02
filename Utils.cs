@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rocket.Core.Logging;
+using System;
 using UnityEngine;
 
 namespace SMultiLangTranslations
@@ -8,6 +9,7 @@ namespace SMultiLangTranslations
         internal static MultiLangManager inst => MultiLangManager.Instance;
         internal static Config conf => MultiLangManager.Instance?.Configuration?.Instance;
         internal const StringComparison DefaultStrComparison = StringComparison.InvariantCultureIgnoreCase;
+
         public static ConsoleColor FromColor(Color32 c)
         {
             int index = c.a > 128 ? 8 : 0; // Bright bit
@@ -15,6 +17,21 @@ namespace SMultiLangTranslations
             index |= (c.g > 64) ? 2 : 0; // Green bit
             index |= (c.b > 64) ? 1 : 0; // Blue bit
             return (ConsoleColor)index;
+        }
+
+        public static void Log(string message, ConsoleColor color = ConsoleColor.White, ELogType type = ELogType.Info, bool log = true, bool rcon = true)
+        {
+            var savColor = Console.ForegroundColor;
+            Console.ForegroundColor = color;
+            Console.WriteLine(message);
+            Console.ForegroundColor = savColor;
+            if (log)
+                AsyncLoggerQueue.Current.Enqueue(new LogEntry
+                {
+                    Severity = type,
+                    Message = message,
+                    RCON = rcon
+                });
         }
     }
 }

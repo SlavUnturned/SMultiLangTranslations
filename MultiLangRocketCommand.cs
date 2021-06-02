@@ -1,17 +1,11 @@
 ﻿using Rocket.API;
 using Rocket.Core;
-using Rocket.Core.Logging;
-using Rocket.Core.Plugins;
-using Rocket.Core.Utils;
-using Rocket.Unturned.Chat;
 using SDG.Unturned;
 using Steamworks;
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using IRP = Rocket.API.IRocketPlayer;
-using Logger = Rocket.Core.Logging.Logger;
 using UP = Rocket.Unturned.Player.UnturnedPlayer;
 
 namespace SMultiLangTranslations
@@ -34,20 +28,31 @@ namespace SMultiLangTranslations
         CSteamID steamID;
 
         /// <summary>
-        /// To use this method - make sure that your plugin is <see langword="MultiLangRocketPlugin"/>
+        /// To use this method - make sure that your plugin is <see cref="MultiLangRocketPlugin"/>
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="placeholder"></param>
-        /// <returns></returns>
-        public string Translate(string key, params object[] placeholder) => Translator?.Translate(steamID, key, placeholder);
+        /// <returns>Translated and formated text</returns>
+        public string Translate(string key, params object[] placeholder) => Translate(steamID, key, placeholder);
+
+        /// <summary>
+        /// To use this method - make sure that your plugin is <see cref="MultiLangRocketPlugin"/>
+        /// </summary>
+        /// <returns>Translated and formated text</returns>
         public string Translate(string code, string key, params object[] placeholder) => Translator?.Translate(code, key, placeholder);
+
+        /// <summary>
+        /// To use this method - make sure that your plugin is <see cref="MultiLangRocketPlugin"/>
+        /// </summary>
+        /// <returns>Translated and formated text</returns>
         public string Translate(CSteamID steamID, string key, params object[] placeholder) => Translator?.Translate(steamID, key, placeholder);
 
         public bool IsConsole(CSteamID steamID) => steamID.m_SteamID == defaultConsoleID;
+
         const ulong defaultConsoleID = 1;
 
         public void Say(string msg, Color color = default(Color), bool rich = false) => Say(steamID, msg, color, rich);
+
         public void Say(IRP irp, string msg, Color color = default(Color), bool rich = false) => Say(new CSteamID(irp.Id == new ConsolePlayer().Id ? defaultConsoleID : ulong.Parse(irp.Id)), msg, color, rich);
+
         public void Say(CSteamID steamID, string msg, Color color = default(Color), bool rich = false)
         {
             var isConsole = IsConsole(steamID);
@@ -58,14 +63,7 @@ namespace SMultiLangTranslations
                 else color = Color.green;
             }
             if (isConsole)
-            {
-                var cmdColor = Utils.FromColor(color);
-                var savColor = Console.ForegroundColor;
-                Console.ForegroundColor = cmdColor;
-                Logger.ExternalLog(msg, cmdColor);
-                Console.WriteLine(msg);
-                Console.ForegroundColor = savColor;
-            }
+                Utils.Log(msg, Utils.FromColor(color));
             else
                 ChatManager.serverSendMessage(msg, color, toPlayer: UP.FromCSteamID(steamID)?.SteamPlayer(), mode: EChatMode.SAY, useRichTextFormatting: rich);
         }
@@ -81,6 +79,7 @@ namespace SMultiLangTranslations
             else steamID = (caller as UP).CSteamID;
             OnExecute(steamID, caller, command);
         }
+
         public abstract void OnExecute(CSteamID CSteamID, IRP caller, string[] command);
     }
 }
