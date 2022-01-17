@@ -15,10 +15,7 @@ namespace SMultiLangTranslations
 
         /// <param name="code">Language-code</param>
         /// <returns>All mappings with key that equals <paramref name="code" /></returns>
-        public IEnumerable<LangMap> this[string code]
-        {
-            get => Mappings.Where(x => x.Key.Equals(code, DefaultStrComparison));
-        }
+        public IEnumerable<LangMap> this[string code] => Mappings.Where(x => x.Key.Compare(code));
 
         /// <summary>
         /// Adds new mapping
@@ -28,10 +25,10 @@ namespace SMultiLangTranslations
         /// <summary>
         /// Tries to get alternative lang-code for specified <paramref name="code" />
         /// </summary>
-        /// <returns>Key of first mapping where Value equals <paramref name="code" /> or <see cref="Config.DefaultLangCode"/> from configuration else <see cref="Config.EnglishLangCode" /></returns>
-        public string Alt(string code) => (
-            Mappings.FirstOrDefault(x => x.Value.Equals(code, DefaultStrComparison)) ??
-            new LangMap(conf?.DefaultLangCode ?? Config.EnglishLangCode, null)
+        /// <returns>Key of first mapping where Value equals <paramref name="code" /> or <see cref="Config.DefaultLangCode"/> from configuration else <see cref="Config.EnglishCode" /></returns>
+        public string Alternative(string code) => (
+            Mappings.FirstOrDefault(x => x.Value.Compare(code)) ??
+            new LangMap(conf?.DefaultLangCode ?? Config.EnglishCode, null)
             ).Key;
     }
 
@@ -71,25 +68,25 @@ namespace SMultiLangTranslations
 
     public class Config : IRocketPluginConfiguration
     {
-        public string DefaultLangCode = EnglishLangCode;
+        public string DefaultLangCode = EnglishCode;
         public LangMapper Mappings = new LangMapper();
         public List<PlayerPreferences> Preferences = new List<PlayerPreferences>();
-        public const string EnglishLangCode = "en";
+        public const string EnglishCode = "en";
 
         public string GetLanguage(CSteamID SteamID)
         {
             string GetLang(CSteamID steamID) => (Preferences.FirstOrDefault(x => x.SteamID == SteamID) ?? new PlayerPreferences()).Language;
             var p = PlayerTool.getPlayer(SteamID);
             var lang = GetLang(SteamID);
-            lang = lang ?? p?.channel.owner.language ?? EnglishLangCode;
+            lang = lang ?? p?.channel.owner.language ?? EnglishCode;
             return lang;
         }
 
         public void SetLanguage(CSteamID SteamID, string language)
         {
-            language = language.ToLower();
+            language = language.ToLowerInvariant();
             var prefId = Preferences.FindIndex(x => x.SteamID == SteamID);
-            if (prefId == -1)
+            if (prefId < 0)
                 Preferences.Add(new PlayerPreferences(SteamID, language));
             else Preferences[prefId].Language = language;
             inst.Configuration.Save();
@@ -97,9 +94,7 @@ namespace SMultiLangTranslations
 
         public void LoadDefaults()
         {
-            var en = EnglishLangCode;
-            Mappings.Map(en, "gb");
-            Mappings.Map(en, "uk");
+            Mappings.Map("ru", "ua");
         }
     }
 }

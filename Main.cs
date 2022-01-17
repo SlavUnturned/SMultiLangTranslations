@@ -8,7 +8,6 @@ using UnityEngine;
 
 namespace SMultiLangTranslations
 {
-
     public class MultiLangManager : MultiLangRocketPlugin<Config>
     {
         public static MultiLangManager Instance;
@@ -46,9 +45,9 @@ namespace SMultiLangTranslations
         void playerConnected(UP up)
         {
             var color = Color.yellow;
-            Log($"Player {up.CSteamID} with language {conf.GetLanguage(up.CSteamID)}", FromColor(color));
+            Log($"Player {up.CSteamID} with language {conf.GetLanguage(up.CSteamID)}", Utils.ToConsoleColor(color));
             foreach(var translation in DefaultTranslations)
-                UnturnedChat.Say(up, Translate(up.CSteamID, translation.Id), color);
+                UnturnedChat.Say(up, Translate(up, translation.Id), color);
         }
 #endif
 

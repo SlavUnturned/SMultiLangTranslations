@@ -22,18 +22,19 @@ namespace SMultiLangTranslations
 
         public override List<string> Permissions => new List<string> { Name };
 
-        public override void OnExecute(CSteamID steamID, IRP caller, string[] args)
+        public override void Execute(IRP caller, string[] args)
         {
-            var message = Translate(LangError);
+            var message = Translate(caller, LangError);
             var color = Color.yellow;
             string lang;
-            if (args.Length == 1 && (lang = args[0]).Length == 2 && lang.All(x => char.IsLetter(x)))
+            var id = caller.GetId();
+            if (args.Length == 1 && (lang = args[0]).All(x => char.IsLetter(x)))
             {
-                conf.SetLanguage(steamID, lang);
-                message = Translate(key: LangChanged, lang);
-                color = default;
+                conf.SetLanguage(id, lang);
+                message = Translate(lang, LangChanged, lang);
+                color = Color.green;
             }
-            Say(message, color);
+            caller.Say(message, color);
         }
 
         internal const string
